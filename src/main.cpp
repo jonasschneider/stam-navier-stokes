@@ -9,16 +9,16 @@
 
 #elif defined(_WIN32)
   #include <windows.h>
-  
+
   #define GLEW_STATIC
-  #include <GL/glew.h> 
-  #include <GL/gl.h> 
-  #include <GL/glu.h> 
+  #include <GL/glew.h>
+  #include <GL/gl.h>
+  #include <GL/glu.h>
 #else
   #include <GL/glew.h>
 #endif
 
-#define _USE_MATH_DEFINES 
+#define _USE_MATH_DEFINES
 #include <cmath>
 
 #include <FreeImage.h>
@@ -98,29 +98,29 @@ void addDensity(float* density, int i, int j, float source) {
 	density[IX(i, j + 1)] = source;
 	density[IX(i - 1, j + 1)] = source;
 
-	density[IX(i, j)] = source; 
+	density[IX(i, j)] = source;
 }
 
 void input() {
-  
+
   float speed = -1.0f;
-  
+
   if (glfwGetKey(GLFW_KEY_UP) == GLFW_PRESS) {
     forward += -speed * dt;
   }
-  
+
   if (glfwGetKey(GLFW_KEY_DOWN) == GLFW_PRESS) {
     forward -= -speed * dt;
   }
-  
+
   if (glfwGetKey(GLFW_KEY_LEFT) == GLFW_PRESS) {
     right -= speed * dt;
   }
-  
+
   if (glfwGetKey(GLFW_KEY_RIGHT) == GLFW_PRESS) {
     right += speed * dt;
   }
-  
+
 	unsigned int size = (NW+2)*(NH+2);
 
 	memset(dens_prev, 0, sizeof(float) * size);
@@ -138,7 +138,7 @@ void input() {
 	memset(color_g_prev, 0, sizeof(float) * size);
 	memset(color_g_u_prev, 0, sizeof(float) * size);
 	memset(color_g_v_prev, 0, sizeof(float) * size);
-  
+
   int mx, my;
   glfwGetMousePos(&mx, &my);
   int i = (int)((mx /(float)WINDOW_WIDTH)*NW+1);
@@ -163,60 +163,60 @@ void input() {
 		addDensity(dens_prev, i, j, source);
 
     if (colorMode == RED) {
-			addDensity(color_r_prev, i, j, source);     
+			addDensity(color_r_prev, i, j, source);
     }
 
     if (colorMode == GREEN) {
-      addDensity(color_g_prev, i, j, source);     
+      addDensity(color_g_prev, i, j, source);
     }
 
     if (colorMode == BLUE) {
-      addDensity(color_b_prev, i, j, source);     
+      addDensity(color_b_prev, i, j, source);
     }
   }
-    
+
   omx = mx;
 	omy = my;
 }
 
 void update() {
-  //stepVelocity(NW, NH, color_r_u, color_r_v, color_r_u_prev, color_r_v_prev, visc, dt);
+  stepVelocity(NW, NH, color_r_u, color_r_v, color_r_u_prev, color_r_v_prev, visc, dt);
   stepDensity(NW, NH, color_r, color_r_prev, color_r_u, color_r_v, diff, dt, size);
 
-  //stepVelocity(NW, NH, color_g_u, color_g_v, color_g_u_prev, color_g_v_prev, visc, dt);
+  stepVelocity(NW, NH, color_g_u, color_g_v, color_g_u_prev, color_g_v_prev, visc, dt);
   stepDensity(NW, NH, color_g, color_g_prev, color_g_u, color_g_v, diff, dt, size);
 
-  //stepVelocity(NW, NH, color_b_u, color_b_v, color_b_u_prev, color_b_v_prev, visc, dt);
+  stepVelocity(NW, NH, color_b_u, color_b_v, color_b_u_prev, color_b_v_prev, visc, dt);
   stepDensity(NW, NH, color_b, color_b_prev, color_b_u, color_b_v, diff, dt, size);
 }
 
 void drawVelocity() {
   float hw = 1.0f / NW;
 	float hh = 1.0f / NH;
-  
+
 	glColor3f(1.0f, 1.0f, 1.0f);
 	glLineWidth(1.0f);
-  
+
 	glBegin (GL_LINES);
-  
+
   for (int i = 1; i <= NW ; i++) {
-    
+
     float x = (i-0.5f) * hw - 0.5;
-    
+
     for (int j=1; j <= NH ; j++) {
- 
+
       float y = (j-0.5f)* hh - 0.5;
-      
+
       glVertex2f(x, y);
       glVertex2f(x+u[IX(i,j)], y+v[IX(i,j)]);
     }
   }
-  
+
 	glEnd ();
 }
 
-void drawDensityComponent(int index, unsigned int& colorIndex) 
-{	
+void drawDensityComponent(int index, unsigned int& colorIndex)
+{
 	float cr = color_r[index];
 	float cg = color_g[index];
 	float cb = color_b[index];
@@ -248,7 +248,7 @@ void drawDensity() {
 
 void render() {
   glTranslatef(0, 0, forward);
-  
+
   if (drawingDensity) drawDensity();
   else drawVelocity();
 }
@@ -258,14 +258,14 @@ void printLog(GLuint obj) {
 	const int maxLength = 256;
 
 	char infoLog[maxLength];
-  
+
 	if (glIsShader(obj)) {
 		glGetShaderInfoLog(obj, maxLength, &infologLength, infoLog);
   }
 	else {
 		glGetProgramInfoLog(obj, maxLength, &infologLength, infoLog);
   }
-  
+
 	if (infologLength > 0) {
 		printf("%s\n",infoLog);
   }
@@ -278,14 +278,14 @@ GLuint createShaderProgram() {
   glShaderSource(vertexShader, 1, &vertexSource, NULL);
   glCompileShader(vertexShader);
   printLog(vertexShader);
-  
+
   std::string fragmentFile = file2string("navierstokes.f.glsl");
   GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
   const char *fragmentSource = fragmentFile.c_str();
   glShaderSource(fragmentShader, 1, &fragmentSource, NULL);
   glCompileShader(fragmentShader);
   printLog(fragmentShader);
-  
+
   GLuint shaderProgram = glCreateProgram();
   glAttachShader(shaderProgram, vertexShader);
   glAttachShader(shaderProgram, fragmentShader);
@@ -293,18 +293,18 @@ GLuint createShaderProgram() {
   glBindAttribLocation(shaderProgram, 0, "position");
 
   glLinkProgram(shaderProgram);
-  
+
   printLog(shaderProgram);
-  
+
   return shaderProgram;
 }
 
 BYTE* LoadTexture(const char* filename, unsigned int* width, unsigned int* height, unsigned int *bpp) {
 	FREE_IMAGE_FORMAT fif = FreeImage_GetFileType(filename, 0);
-	
+
 	if(fif == FIF_UNKNOWN) fif = FreeImage_GetFIFFromFilename(filename);
 	if(fif == FIF_UNKNOWN) return 0;
-	
+
 	FIBITMAP *dib = 0;
 	if(FreeImage_FIFSupportsReading(fif)) dib = FreeImage_Load(fif, filename);
 
@@ -395,10 +395,10 @@ void keyCallback(int keyCode, int action) {
 	if (glfwGetKey('V') && action == GLFW_PRESS) {
 		if (visc == 0.0f) {
 			visc = 0.00001f;
-		} else 
+		} else
 		if (visc == 0.00001f) {
 			visc = 0.0001f;
-		} else 
+		} else
 		if (visc == 0.0001f) {
 			visc = 0.001f;
 		} else
@@ -424,7 +424,7 @@ void keyCallback(int keyCode, int action) {
 		} else
 		if (force == 0.1f) {
 			force = 1.0f;
-		} else 
+		} else
 		if (force == 1.0f) {
 			force = 2.0f;
 		}
@@ -487,12 +487,12 @@ int main(int argc, const char * argv[]) {
   printf("%s\n", argv[1]);
   printf("viscosity %f\n", visc);
   printf("force %f\n", force);
- 
+
 	printHelp();
 
   size = (NW+2)*(NH+2);//*(N+2); // cube
 
-  
+
 	u = (float *)malloc(size * sizeof(float));
 	v = (float *)malloc(size * sizeof(float));
 	u_prev = (float *)malloc(size * sizeof(float));
@@ -520,7 +520,7 @@ int main(int argc, const char * argv[]) {
   color_b_v_prev = (float *)malloc(size * sizeof(float));
   color_b = (float *)malloc(size * sizeof(float));
   color_b_prev = (float *)malloc(size * sizeof(float));
-  
+
   GLboolean running;
 
 	clear();
@@ -538,7 +538,7 @@ int main(int argc, const char * argv[]) {
 			BYTE b = imageData[0+(i*components)];
 			BYTE g = imageData[1+(i*components)];
 			BYTE r = imageData[2+(i*components)];
-			
+
 			color_r[i] = r / 255.0f;
 			color_g[i] = g / 255.0f;
 			color_b[i] = b / 255.0f;
@@ -549,7 +549,7 @@ int main(int argc, const char * argv[]) {
     fprintf( stderr, "Failed to initialize GLFW\n" );
     return EXIT_FAILURE;
   }
- 
+
   if(!glfwOpenWindow(WINDOW_WIDTH, WINDOW_HEIGHT, 0, 0, 0, 0, 0, 0, GLFW_WINDOW)) {
     fprintf(stderr, "Failed to open GLFW window\n");
     glfwTerminate();
@@ -560,12 +560,12 @@ int main(int argc, const char * argv[]) {
   if (GLEW_OK != err) {
     fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
   }
-  
-  
+
+
   glfwSetKeyCallback(keyCallback);
   glfwSetWindowTitle("Fluid Simulation - Navier Stokes");
   glfwSwapInterval(1);
-  
+
   GLuint shaderProgram = createShaderProgram();
 
   vertexSize = (NW + 1) * (NH + 1) * 2 * 4;
@@ -580,7 +580,7 @@ int main(int argc, const char * argv[]) {
 
   for (float i = 0 ; i <= NW ; i++) {
     float x = (i - 0.5f) * hw - 0.5;
-    
+
     for (float j = 0 ; j <= NH ; j++) {
       float y = (j - 0.5f) * hh - 0.5;
 
@@ -648,44 +648,44 @@ int main(int argc, const char * argv[]) {
 
   glVertexAttribPointer(1, 4, GL_FLOAT, 0, 0, 0);
   glEnableVertexAttribArray(1);
-  
+
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
   forward = -2.0f;
-  
+
   running = GL_TRUE;
 
   while (running) {
-    
+
     input();
     update();
-    
+
     glClearColor(0, 0, 0, 1);
     glClear(GL_COLOR_BUFFER_BIT);
     glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
-    
+
     glUseProgram(shaderProgram);
-    
+
     glm::mat4 projection = glm::perspective(45.0f, (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
     GLuint projectionLocation = glGetUniformLocation(shaderProgram, "Projection");
     glUniformMatrix4fv(projectionLocation, 1, false, glm::value_ptr(projection));
-    
+
     glm::mat4 view(1.0f);
     view = glm::rotate(view, (yRotation / (float)M_PI) * 180.0f, glm::vec3(0, 1, 0));
     view = glm::translate(view, glm::vec3(right, up, forward));
-  
+
     GLuint viewLocation = glGetUniformLocation(shaderProgram, "View");
     glUniformMatrix4fv(viewLocation, 1, false, glm::value_ptr(view));
 
     render();
-    
+
     glfwSwapBuffers();
-    
+
     running = !glfwGetKey(GLFW_KEY_ESC) && glfwGetWindowParam(GLFW_OPENED);
   }
-  
+
   glfwTerminate();
-  
+
   return 0;
 }

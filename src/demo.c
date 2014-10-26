@@ -18,13 +18,13 @@
 #include <stdio.h>
 
 #include <windows.h>
-  
+
 #define GLEW_STATIC
 #pragma comment(lib, "opengl32")
 #pragma comment(lib, "glu32")
-#include <GL/glew.h> 
-#include <GL/gl.h> 
-#include <GL/glu.h> 
+#include <GL/glew.h>
+#include <GL/gl.h>
+#include <GL/glu.h>
 #include <GL/glfw.h>
 
 
@@ -87,7 +87,7 @@ static int allocate_data ( void )
 	v			= (float *) malloc ( size*sizeof(float) );
 	u_prev		= (float *) malloc ( size*sizeof(float) );
 	v_prev		= (float *) malloc ( size*sizeof(float) );
-	dens		= (float *) malloc ( size*sizeof(float) );	
+	dens		= (float *) malloc ( size*sizeof(float) );
 	dens_prev	= (float *) malloc ( size*sizeof(float) );
 
 	if ( !u || !v || !u_prev || !v_prev || !dens || !dens_prev ) {
@@ -139,7 +139,7 @@ static void draw_velocity ( void )
 			for ( j=1 ; j<=N ; j++ ) {
 				y = (j-0.5f)*h;
 
-        
+
 
 				glVertex2f ( x, y );
 				glVertex2f ( x+(u[IX(i,j)]*linescale), y+(v[IX(i,j)]*linescale) );
@@ -313,23 +313,23 @@ static void open_glut_window ( void )
   }
 
   glfwSetKeyCallback(keyCallback);
-  glfwSetWindowTitle("Fluid Simulation - Navier Stokes");
+  glfwSetWindowTitle("Fluid Simulation - Navier Stokes demo.cpp");
   glfwSwapInterval(1);
 
 // 	glutInitDisplayMode ( GLUT_RGBA | GLUT_DOUBLE );
-// 
+//
 // 	glutInitWindowPosition ( 0, 0 );
 // 	glutInitWindowSize ( win_x, win_y );
 // 	win_id = glutCreateWindow ( "Alias | wavefront" );
-// 
+//
 // 	glClearColor ( 0.0f, 0.0f, 0.0f, 1.0f );
 // 	glClear ( GL_COLOR_BUFFER_BIT );
 // 	glutSwapBuffers ();
 // 	glClear ( GL_COLOR_BUFFER_BIT );
 // 	glutSwapBuffers ();
-// 
+//
 // 	pre_display ();
-// 
+//
 // 	glutKeyboardFunc ( key_func );
 // 	glutMouseFunc ( mouse_func );
 // 	glutMotionFunc ( motion_func );
@@ -376,15 +376,15 @@ int main ( int argc, char ** argv )
     fprintf( stderr, "Failed to initialize GLFW\n" );
     return EXIT_FAILURE;
   }
- 
-  
+
+
 
 // 	GLenum err = glewInit();
 //   if (GLEW_OK != err) {
 //     fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
 //   }
-  
- 
+
+
 
 	if ( argc != 1 && argc != 6 ) {
 		fprintf ( stderr, "usage : %s N dt diff visc force source\n", argv[0] );
