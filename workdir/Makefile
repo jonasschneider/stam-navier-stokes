@@ -1,2 +1,7 @@
-all:
-	clang++ -O3 ../src/*.cpp -g -lglfw -lGLEW -framework OpenCL -lfreeimage -o navier-stokes -framework OpenGL
+all: cppdemo cdemo
+
+cdemo: ../src/*.c
+	clang -O3 ../src/*.c -I./include -lglfw -lGLEW -framework OpenCL -lfreeimage -o cdemo -framework OpenGL
+
+cppdemo: ../src/*.cpp
+	clang++ -O3 ../src/*.cpp -lglfw -lGLEW -framework OpenCL -lfreeimage -o cppdemo -framework OpenGL
